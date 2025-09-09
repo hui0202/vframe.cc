@@ -683,7 +683,7 @@ export default function ExtractPage() {
                   disabled={!file || isRunning || !extractor || allFrames.length === 0 || (method === "current-frame" && !selectedFrame)}
                   onClick={extractFrames}
                   size="lg"
-                  className="flex-1 sm:flex-none"
+                  className="flex-1 sm:flex-none cursor-pointer"
                 >
                   {isRunning ? "Processing..." : 
                    method === "current-frame" ? "Extract Selected Frame" : 
