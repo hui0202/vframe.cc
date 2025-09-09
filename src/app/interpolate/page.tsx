@@ -19,6 +19,29 @@ import {
   formatFileSize,
 } from "@/lib/upload-config";
 
+// Import structured data for interpolation
+const interpolationSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "RIFE AI Video Interpolation Tool",
+  "description": "Double video frame rates using RIFE AI interpolation technology. Enhance video smoothness from 24/30 FPS to 60/120 FPS.",
+  "url": "https://vframe.cc/interpolate",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "RIFE AI interpolation technology",
+    "Double video frame rates",
+    "Enhance video smoothness",
+    "Support for various video formats",
+    "Real-time processing preview"
+  ]
+};
+
 // LocalStorage keys
 const STORAGE_KEY_PREFIX = 'vframe_interpolation_';
 const STORAGE_KEY_HISTORY = `${STORAGE_KEY_PREFIX}history`;
@@ -265,7 +288,16 @@ export default function InterpolatePage() {
   };
 
   return (
-    <div className="grid gap-6 pb-8">
+    <>
+      {/* Structured Data for Interpolate Page */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(interpolationSchema)
+        }}
+      />
+      
+      <div className="grid gap-6 pb-8">
       <Card>
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">
@@ -276,11 +308,64 @@ export default function InterpolatePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6">
+          {/* Upload Section */}
+          <div className="grid gap-4">
+            <div className="flex flex-col lg:flex-row gap-4 items-stretch w-full">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => document.getElementById('main-video-file-input')?.click()}
+                className="flex items-center justify-center gap-3 px-6 py-3 text-base lg:w-64 shrink-0"
+              >
+                <span className="text-2xl">📁</span>
+                Upload Video File
+              </Button>
+              
+              <span className="text-sm text-body-secondary self-center">or</span>
+              
+              <div className="flex gap-3 flex-1">
+                <Input
+                  id="video-url"
+                  type="url"
+                  placeholder="https://example.com/video.mp4"
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    if (e.target.value) {
+                      setFile(null); // Clear file when URL is provided
+                      setIsUsingDemo(false); // Switch from demo mode
+                      setResultReady(false); // Clear demo results
+                      setInterpolatedVideoUrl(""); // Clear demo video URL
+                    }
+                  }}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            
+            <input
+              id="main-video-file-input"
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  setFile(selectedFile);
+                  setVideoUrl(""); // Clear URL when file is selected
+                  setIsUsingDemo(false); // Switch from demo mode
+                  setResultReady(false); // Clear demo results
+                  setInterpolatedVideoUrl(""); // Clear demo video URL
+                }
+              }}
+            />
+          </div>
+
           {/* Video Comparison Section */}
             <div className="grid gap-4">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex flex-col md:flex-row gap-6">
               {/* Original Video */}
-              <div className="field">
+              <div className="field flex-1">
                 <Label>Original Video {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
                 <div className="flex flex-col h-full">
                   {/* Video Container */}
@@ -290,6 +375,8 @@ export default function InterpolatePage() {
                       <video
                         controls
                         loop
+                        autoPlay
+                        muted
                         className="w-full max-h-96 rounded-lg border border-border object-contain"
                         src={URL.createObjectURL(file)}
                         ref={(video) => {
@@ -300,34 +387,20 @@ export default function InterpolatePage() {
                       >
                           Your browser does not support the video tag.
                         </video>
-                        <div className="absolute top-0 left-0 right-0 bottom-12 bg-black rounded-t-lg flex items-center justify-center opacity-0 group-hover:opacity-40 transition-opacity cursor-pointer"
-                             onClick={() => document.getElementById('video-file-input')?.click()}>
+                        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                             onClick={() => document.getElementById('main-video-file-input')?.click()}>
                           <div className="text-white text-center drop-shadow-lg">
-                            <div className="text-lg mb-1">📁</div>
+                            <div className="text-2xl mb-2">📁</div>
                             <p className="text-sm font-medium">Click to change video</p>
                           </div>
                         </div>
-                        <input
-                          id="video-file-input"
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                        onChange={(e) => {
-                        const selectedFile = e.target.files?.[0];
-                        if (selectedFile) {
-                          setFile(selectedFile);
-                          setVideoUrl(""); // Clear URL when file is selected
-                          setIsUsingDemo(false); // Switch from demo mode
-                          setResultReady(false); // Clear demo results
-                          setInterpolatedVideoUrl(""); // Clear demo video URL
-                        }
-                      }}
-                        />
                       </div>
                     ) : videoUrl ? (
                     <video
                       controls
                       loop
+                      autoPlay
+                      muted
                       className="w-full max-h-96 rounded-lg border border-border object-contain"
                       src={videoUrl}
                       ref={(video) => {
@@ -343,6 +416,8 @@ export default function InterpolatePage() {
                         <video
                           controls
                           loop
+                          autoPlay
+                          muted
                           className="w-full max-h-96 rounded-lg border border-border object-contain"
                           src={demoOriginalUrl}
                           ref={(video) => {
@@ -353,56 +428,24 @@ export default function InterpolatePage() {
                         >
                           Your browser does not support the video tag.
                         </video>
-                        <div className="absolute top-0 left-0 right-0 bottom-12 bg-black rounded-t-lg flex items-center justify-center opacity-0 group-hover:opacity-40 transition-opacity cursor-pointer"
-                             onClick={() => document.getElementById('video-file-input')?.click()}>
+                        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                             onClick={() => document.getElementById('main-video-file-input')?.click()}>
                           <div className="text-white text-center drop-shadow-lg">
-                            <div className="text-lg mb-1">📁</div>
+                            <div className="text-2xl mb-2">📁</div>
                             <p className="text-sm font-medium">Click to upload your video</p>
                           </div>
                         </div>
-                        <input
-                          id="video-file-input"
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                        onChange={(e) => {
-                        const selectedFile = e.target.files?.[0];
-                        if (selectedFile) {
-                          setFile(selectedFile);
-                          setVideoUrl(""); // Clear URL when file is selected
-                          setIsUsingDemo(false); // Switch from demo mode
-                          setResultReady(false); // Clear demo results
-                          setInterpolatedVideoUrl(""); // Clear demo video URL
-                        }
-                      }}
-                        />
                       </div>
                     ) : (
                       <div 
-                        className="w-full h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors"
-                        onClick={() => document.getElementById('video-file-input')?.click()}
+                        className="w-full min-h-[300px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors aspect-video"
+                        onClick={() => document.getElementById('main-video-file-input')?.click()}
                       >
                         <div className="text-center">
                           <div className="text-4xl mb-2">📁</div>
                           <p className="text-body-secondary">Click to select video file</p>
-                          <p className="text-xs text-body-secondary mt-1">or provide URL below</p>
+                          <p className="text-xs text-body-secondary mt-1">or use the upload button above</p>
                         </div>
-                        <input
-                          id="video-file-input"
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                        onChange={(e) => {
-                        const selectedFile = e.target.files?.[0];
-                        if (selectedFile) {
-                          setFile(selectedFile);
-                          setVideoUrl(""); // Clear URL when file is selected
-                          setIsUsingDemo(false); // Switch from demo mode
-                          setResultReady(false); // Clear demo results
-                          setInterpolatedVideoUrl(""); // Clear demo video URL
-                        }
-                      }}
-                        />
                       </div>
                     )}
                   </div>
@@ -424,7 +467,7 @@ export default function InterpolatePage() {
               </div>
 
               {/* Interpolated Video */}
-              <div className="field">
+              <div className="field flex-1">
                 <Label>Interpolated Video (2x Frame Rate) {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
                 <div className="flex flex-col h-full">
                   {/* Video Container */}
@@ -433,6 +476,8 @@ export default function InterpolatePage() {
                       <video
                         controls
                         loop
+                        autoPlay
+                        muted
                         className="w-full max-h-96 rounded-lg border border-border object-contain"
                         src={isUsingDemo ? demoInterpolatedUrl : interpolatedVideoUrl}
                         ref={(video) => {
@@ -444,7 +489,7 @@ export default function InterpolatePage() {
                         Your browser does not support the video tag.
                       </video>
                     ) : (
-                      <div className="w-full min-h-[200px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center aspect-video">
+                      <div className="w-full min-h-[300px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center aspect-video">
                         <div className="text-center">
                           <div className="text-4xl mb-2">🎬</div>
                           <p className="text-body-secondary">
@@ -518,30 +563,6 @@ export default function InterpolatePage() {
             )}
           </div>
 
-          {/* Parameters Section */}
-          <div className="grid gap-4">
-                  <div className="field">
-              <Label htmlFor="video-url">Video URL (Alternative)</Label>
-                <Input
-                  id="video-url"
-                  type="url"
-                  placeholder="https://example.com/video.mp4"
-                  value={videoUrl}
-                onChange={(e) => {
-                  setVideoUrl(e.target.value);
-                  if (e.target.value) {
-                    setFile(null); // Clear file when URL is provided
-                    setIsUsingDemo(false); // Switch from demo mode
-                    setResultReady(false); // Clear demo results
-                    setInterpolatedVideoUrl(""); // Clear demo video URL
-                  }
-                }}
-                />
-                <p className="help-text">
-                Provide a direct video URL instead of uploading a file
-                </p>
-              </div>
-            </div>
 
           {/* Controls Section */}
             <div className="grid gap-4">
@@ -601,6 +622,8 @@ export default function InterpolatePage() {
                               className="w-full h-full object-cover"
                               src={item.interpolatedVideoUrl}
                               muted
+                              autoPlay
+                              loop
                               playsInline
                             />
                           </div>
@@ -648,7 +671,8 @@ export default function InterpolatePage() {
         </CardContent>
       </Card>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

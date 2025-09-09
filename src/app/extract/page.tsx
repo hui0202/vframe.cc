@@ -12,6 +12,7 @@ import { VideoFrameExtractor, ExtractedVideoFrame } from "@/lib/video-frame-extr
 import { extractVideoMetadata } from "@/lib/extract-video-metadata";
 import { VideoFrameSelector } from "@/components/VideoFrameSelector";
 import { cn } from "@/lib/cn";
+import { softwareApplicationSchema, howToSchema } from "@/lib/seo-data";
 
 interface ExtractionResult {
   frames: ExtractedVideoFrame[];
@@ -211,7 +212,16 @@ export default function ExtractPage() {
   };
 
   return (
-    <div className="grid gap-6 pb-8">
+    <>
+      {/* Structured Data for Extract Page */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([softwareApplicationSchema, howToSchema])
+        }}
+      />
+      
+      <div className="grid gap-6 pb-8">
       <Card>
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">Video Frame Extraction</CardTitle>
@@ -837,7 +847,8 @@ export default function ExtractPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

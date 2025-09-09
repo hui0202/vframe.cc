@@ -1,10 +1,20 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { websiteSchema, organizationSchema, webApplicationSchema } from "@/lib/seo-data";
 
 export default function Home() {
   return (
-    <div className="grid gap-16">
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([websiteSchema, organizationSchema, webApplicationSchema])
+        }}
+      />
+      
+      <div className="grid gap-16">
       {/* 英雄区域 */}
       <section className="grid gap-8 text-center py-12">
         <div className="space-y-6">
@@ -99,6 +109,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
