@@ -1,9 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { websiteSchema, organizationSchema, webApplicationSchema } from "@/lib/seo-data";
+import { BlurGradientBg } from "@/lib/BlurGradientBg.module.js"
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+    const colorbg = new BlurGradientBg({
+      dom: "box",
+      colors: [
+        "#1a1a1f", // 深色基调
+        "#2d1b69", // 深蓝紫（更暗）
+        "#1e1e20", // 暗色调
+        "#0f0f11"  // 最深色调
+      ],
+      resize_mode: "cover",
+      seed: 2024
+    });
+
+    return () => {
+      // Cleanup when component unmounts
+      if (colorbg && colorbg.destroy) {
+        colorbg.destroy();
+      }
+    };
+  }, []);
   return (
     <>
       {/* Structured Data */}
@@ -14,12 +38,21 @@ export default function Home() {
         }}
       />
       
-      <div className="grid gap-16">
+      {/* Background container - 使用正常文档流 */}
+      <div id="box" className="fixed inset-0 -z-50"></div>
+      
+      {/* Subtle overlay for better text readability */}
+      <div className="fixed inset-0 -z-40 bg-gradient-to-br from-black/10 via-transparent to-black/20 pointer-events-none"></div>
+      
+      <div className="grid gap-16 relative z-10">
       {/* 英雄区域 */}
-      <section className="grid gap-8 text-center py-12">
-        <div className="space-y-6">
+      <section className="grid gap-8 text-center py-12 relative">
+        {/* 标题区域亮度增强 */}
+        <div className="absolute inset-0 bg-gradient-radial from-white/10 via-white/5 to-transparent opacity-80 pointer-events-none"></div>
+        
+        <div className="space-y-6 relative z-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl heading-primary">
-            <span className="text-gradient-primary">
+            <span className="text-gradient-primary drop-shadow-lg">
               vframe.cc
             </span>
           </h1>
@@ -28,12 +61,12 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 px-4">
             <Link href="/extract">
-              <Button size="lg" className="text-base px-8 w-full sm:w-auto">
+              <Button size="lg" className="text-base px-8 w-full sm:w-auto cursor-pointer">
                 🎬 Extract Frames
               </Button>
             </Link>
             <Link href="/interpolate">
-              <Button variant="outline" size="lg" className="text-base px-8 w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="text-base px-8 w-full sm:w-auto cursor-pointer">
                 ⚡ Try Interpolation
               </Button>
             </Link>

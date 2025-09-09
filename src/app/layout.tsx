@@ -108,7 +108,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="border-b border-border/50 backdrop-filter backdrop-blur-lg bg-background/80 sticky top-0 z-50">
+        <header className="border-b border-border/50 bg-background/95 sticky top-0 z-50 supports-[backdrop-filter]:backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
           <div className="container-page flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
               <img 
@@ -126,7 +126,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="container-page py-12">{children}</main>
-        <footer className="border-t border-border/50 backdrop-filter backdrop-blur-sm bg-background/50">
+        <footer className="border-t border-border/50 bg-background/90 supports-[backdrop-filter]:backdrop-blur-sm supports-[backdrop-filter]:bg-background/50">
           <div className="container-page h-16 flex items-center justify-between text-sm text-body-secondary">
             <span>© {new Date().getFullYear()} vframe.cc - Professional Video Processing Tool</span>
             <span className="text-gradient-accent text-emphasis">Making video processing easier</span>
