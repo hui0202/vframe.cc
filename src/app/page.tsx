@@ -12,10 +12,10 @@ export default function Home() {
     const colorbg = new BlurGradientBg({
       dom: "box",
       colors: [
-        "#1a1a1f", // 深色基调
-        "#2d1b69", // 深蓝紫（更暗）
-        "#1e1e20", // 暗色调
-        "#0f0f11"  // 最深色调
+        "#1a1a1f",
+        "#2d1b69",
+        "#1e1e20",
+        "#0f0f11"
       ],
       resize_mode: "cover",
       seed: 2024
