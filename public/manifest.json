@@ -4,15 +4,10 @@
   "description": "Professional video processing tool for frame extraction and RIFE AI interpolation",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#000000",
+  "theme_color": "#667eea",
   "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "/favicon.ico",
-      "sizes": "any",
-      "type": "image/x-icon"
-    },
     {
       "src": "/favicon-16x16.png",
       "sizes": "16x16",
