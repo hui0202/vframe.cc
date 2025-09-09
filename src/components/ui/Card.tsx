@@ -6,7 +6,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-6 pt-6 pb-2", className)} {...props} />;
+  return <div className={cn("px-4 sm:px-6 pt-4 sm:pt-6 pb-2", className)} {...props} />;
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
@@ -18,7 +18,7 @@ export function CardDescription({ className, ...props }: React.HTMLAttributes<HT
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-6 pb-6", className)} {...props} />;
+  return <div className={cn("px-4 sm:px-6 pb-4 sm:pb-6 overflow-hidden", className)} {...props} />;
 }
 
 

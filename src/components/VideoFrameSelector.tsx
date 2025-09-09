@@ -30,6 +30,7 @@ export function VideoFrameSelector({
   
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const sliderRef = React.useRef<HTMLInputElement>(null);
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
   // Extract frames when extractor is available
   React.useEffect(() => {
@@ -83,9 +84,13 @@ export function VideoFrameSelector({
         const originalHeight = frame.imageBitmap.height;
         const aspectRatio = originalWidth / originalHeight;
         
-        // Maximum display dimensions
-        const maxDisplayWidth = 800;
-        const maxDisplayHeight = 450;
+        // Get viewport dimensions for responsive sizing
+        const viewportWidth = window.innerWidth;
+        const isMobile = viewportWidth < 640;
+        
+        // Maximum display dimensions based on device
+        const maxDisplayWidth = isMobile ? viewportWidth - 32 : Math.min(800, viewportWidth - 64);
+        const maxDisplayHeight = isMobile ? window.innerHeight * 0.5 : 450;
         
         let displayWidth = originalWidth;
         let displayHeight = originalHeight;
@@ -101,17 +106,18 @@ export function VideoFrameSelector({
           displayWidth = displayHeight * aspectRatio;
         }
         
-        // Set canvas to display size
-        canvas.width = displayWidth;
-        canvas.height = displayHeight;
+        // Set canvas internal resolution to match original for quality
+        canvas.width = originalWidth;
+        canvas.height = originalHeight;
         
-        // Set CSS size to match canvas size for crisp display
-        canvas.style.width = `${displayWidth}px`;
-        canvas.style.height = `${displayHeight}px`;
+        // Let CSS handle the responsive sizing
+        // Remove inline styles to let className handle it
+        canvas.style.width = '';
+        canvas.style.height = '';
         
-        // Clear and draw the frame
-        ctx.clearRect(0, 0, displayWidth, displayHeight);
-        ctx.drawImage(frame.imageBitmap, 0, 0, displayWidth, displayHeight);
+        // Clear and draw the frame at full resolution
+        ctx.clearRect(0, 0, originalWidth, originalHeight);
+        ctx.drawImage(frame.imageBitmap, 0, 0, originalWidth, originalHeight);
         
         onFrameSelect?.(frame);
       }
@@ -153,6 +159,18 @@ export function VideoFrameSelector({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
+
+  // Add resize event listener to recalculate canvas size
+  React.useEffect(() => {
+    const handleResize = () => {
+      forceUpdate();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -209,17 +227,11 @@ export function VideoFrameSelector({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Video Frame Display */}
-      <div className="relative rounded-lg overflow-hidden bg-black shadow-lg">
-        <div className="flex items-center justify-center p-4">
+      <div className="relative rounded-lg overflow-hidden bg-black/95 shadow-lg">
+        <div className="flex items-center justify-center p-2 sm:p-4 min-h-[200px] md:min-h-[300px]">
           <canvas
             ref={canvasRef}
-            className="block"
-            style={{ 
-              maxWidth: '100%',
-              maxHeight: '450px',
-              width: 'auto',
-              height: 'auto'
-            }}
+            className="block w-auto h-auto max-w-full max-h-[50vh] md:max-h-[60vh] object-contain"
           />
         </div>
         

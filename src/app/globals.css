@@ -145,7 +145,9 @@ footer {
 
 /* component base */
 .container-page {
-  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  @apply mx-auto w-full max-w-6xl px-3 sm:px-6 lg:px-8;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* 移动端优化 */
@@ -188,6 +190,15 @@ footer {
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* 视频元素全局样式 - 保持原始比例 */
+video {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 .field {
@@ -424,4 +435,136 @@ footer {
   position: absolute;
   left: 0;
   text-shadow: 0 0 4px rgba(102, 126, 234, 0.3);
+}
+
+/* 移动端视频容器优化 */
+@media (max-width: 640px) {
+  /* 全局box-sizing重置 */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* 防止全局溢出 */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* 视频元素优化 - 保持原始比例 */
+  video {
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: 50vh !important;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  /* 视频容器父元素约束 */
+  .field {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* 视频容器尺寸优化 */
+  .aspect-video {
+    min-height: 200px !important;
+    max-height: 50vh !important;
+    max-width: 100% !important;
+  }
+  
+  /* 视频占位容器优化 */
+  .min-h-\[200px\] {
+    min-height: 200px !important;
+  }
+  
+  .min-h-\[300px\] {
+    min-height: 200px !important;
+  }
+  
+  .max-h-\[50vh\] {
+    max-height: 50vh !important;
+  }
+  
+  .max-h-96 {
+    max-height: 50vh !important;
+  }
+  
+  /* 防止容器溢出 */
+  .container-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    box-sizing: border-box;
+  }
+  
+  /* 网格和flex容器约束 */
+  .grid {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* 移动端flex容器优化 */
+  .flex {
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .flex > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .flex-1 {
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  /* 相对定位容器约束 */
+  .relative {
+    max-width: 100%;
+  }
+  
+  .group {
+    max-width: 100%;
+  }
+  
+  /* 移动端按钮和输入框优化 */
+  button {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  input[type="url"],
+  input[type="text"] {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* 表格水平滚动 */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+  
+  table {
+    font-size: 0.875rem;
+  }
+  
+  th, td {
+    padding: 0.5rem !important;
+  }
+  
+  /* Card组件约束 */
+  .card-base {
+    max-width: 100%;
+    overflow: hidden;
+  }
 }

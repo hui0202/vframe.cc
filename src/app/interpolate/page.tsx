@@ -313,8 +313,9 @@ export default function InterpolatePage() {
         }}
       />
       
-      <div className="grid gap-6 pb-8">
-      <Card>
+      <div className="container-page overflow-hidden">
+        <div className="grid gap-6 pb-8 w-full max-w-full">
+      <Card className="w-full max-w-full overflow-hidden">
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">
             RIFE AI Video Interpolation - Double Frame Rate
@@ -323,7 +324,7 @@ export default function InterpolatePage() {
             Upload a video file or provide a video URL to double the frame rate using RIFE AI interpolation technology.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6">
+        <CardContent className="grid gap-6 overflow-hidden max-w-full">
           {/* Upload Section */}
           <div className="grid gap-4">
             <div className="flex flex-col lg:flex-row gap-4 items-stretch w-full">
@@ -378,22 +379,23 @@ export default function InterpolatePage() {
           </div>
 
           {/* Video Comparison Section */}
-            <div className="grid gap-4">
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="grid gap-4 overflow-hidden">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6">
               {/* Original Video */}
-              <div className="field flex-1">
+              <div className="field flex-1 min-w-0 overflow-hidden">
                 <Label>Original Video {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full w-full">
                   {/* Video Container */}
-                  <div className="flex-1">
+                  <div className="flex-1 w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg">
                     {file ? (
-                      <div className="relative group">
+                      <div className="relative group w-full">
                       <video
                         controls
                         loop
                         autoPlay
                         muted
-                        className="w-full max-h-96 rounded-lg border border-border object-contain"
+                        className="max-w-full max-h-[50vh] md:max-h-96 rounded-lg border border-border"
+                        style={{ width: 'auto', height: 'auto', objectFit: 'contain' }}
                         src={URL.createObjectURL(file)}
                         ref={(video) => {
                           if (video) {
@@ -417,7 +419,8 @@ export default function InterpolatePage() {
                       loop
                       autoPlay
                       muted
-                      className="w-full max-h-96 rounded-lg border border-border object-contain"
+                      className="max-w-full max-h-[50vh] md:max-h-96 rounded-lg border border-border"
+                      style={{ width: 'auto', height: 'auto', objectFit: 'contain' }}
                       src={videoUrl}
                       ref={(video) => {
                         if (video) {
@@ -428,13 +431,14 @@ export default function InterpolatePage() {
                         Your browser does not support the video tag.
                       </video>
                     ) : isUsingDemo ? (
-                      <div className="relative group">
+                      <div className="relative group w-full">
                         <video
                           controls
                           loop
                           autoPlay
                           muted
-                          className="w-full max-h-96 rounded-lg border border-border object-contain"
+                          className="max-w-full max-h-[50vh] md:max-h-96 rounded-lg border border-border"
+                          style={{ width: 'auto', height: 'auto', objectFit: 'contain' }}
                           src={demoOriginalUrl}
                           ref={(video) => {
                             if (video) {
@@ -454,7 +458,7 @@ export default function InterpolatePage() {
                       </div>
                     ) : (
                       <div 
-                        className="w-full min-h-[300px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors aspect-video"
+                        className="w-full min-h-[200px] md:min-h-[300px] max-h-[50vh] md:max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors"
                         onClick={() => document.getElementById('main-video-file-input')?.click()}
                       >
                         <div className="text-center">
@@ -483,18 +487,19 @@ export default function InterpolatePage() {
               </div>
 
               {/* Interpolated Video */}
-              <div className="field flex-1">
+              <div className="field flex-1 min-w-0 overflow-hidden">
                 <Label>Interpolated Video (2x Frame Rate) {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full w-full">
                   {/* Video Container */}
-                  <div className="flex-1">
+                  <div className="flex-1 w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg">
                     {resultReady && !isRunning && interpolatedVideoUrl ? (
                       <video
                         controls
                         loop
                         autoPlay
                         muted
-                        className="w-full max-h-96 rounded-lg border border-border object-contain"
+                        className="max-w-full max-h-[50vh] md:max-h-96 rounded-lg border border-border"
+                        style={{ width: 'auto', height: 'auto', objectFit: 'contain' }}
                         src={isUsingDemo ? demoInterpolatedUrl : interpolatedVideoUrl}
                         ref={(video) => {
                           if (video) {
@@ -505,7 +510,7 @@ export default function InterpolatePage() {
                         Your browser does not support the video tag.
                       </video>
                     ) : (
-                      <div className="w-full min-h-[300px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center aspect-video">
+                      <div className="w-full min-h-[200px] md:min-h-[300px] max-h-[50vh] md:max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center aspect-video">
                         <div className="text-center">
                           <div className="text-4xl mb-2">🎬</div>
                           <p className="text-body-secondary">
@@ -603,7 +608,7 @@ export default function InterpolatePage() {
 
       {/* History Section */}
       {historyItems.length > 0 && (
-        <Card>
+        <Card className="w-full max-w-full overflow-hidden">
           <CardHeader>
             <CardTitle className="heading-secondary">
               Processing History
@@ -696,7 +701,8 @@ export default function InterpolatePage() {
           </div>
         </CardContent>
       </Card>
-      )}
+       )}
+        </div>
       </div>
     </>
   );
