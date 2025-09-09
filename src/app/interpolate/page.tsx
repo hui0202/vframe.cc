@@ -313,8 +313,8 @@ export default function InterpolatePage() {
         }}
       />
       
-      <div className="container-page overflow-hidden">
-        <div className="grid gap-6 pb-8 w-full max-w-full">
+      <div className="w-full overflow-x-hidden">
+        <div className="grid gap-4 md:gap-6 w-full max-w-6xl mx-auto md:px-6 lg:px-8 pb-8 box-border">
       <Card className="w-full max-w-full overflow-hidden">
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">
@@ -327,20 +327,23 @@ export default function InterpolatePage() {
         <CardContent className="grid gap-6 overflow-hidden max-w-full">
           {/* Upload Section */}
           <div className="grid gap-4">
-            <div className="flex flex-col lg:flex-row gap-4 items-stretch w-full">
+            <div className="flex flex-col gap-3 w-full">
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => document.getElementById('main-video-file-input')?.click()}
-                className="flex items-center justify-center gap-3 px-6 py-3 text-base lg:w-64 shrink-0"
+                className="flex items-center justify-center gap-3 w-full"
               >
-                <span className="text-2xl">📁</span>
-                Upload Video File
+                <span className="text-xl">📁</span>
+                <span>Upload Video File</span>
               </Button>
               
-              <span className="text-sm text-body-secondary self-center">or</span>
+              <div className="flex items-center gap-3 text-sm text-body-secondary">
+                <div className="flex-1 h-px bg-border"></div>
+                <span>or</span>
+                <div className="flex-1 h-px bg-border"></div>
+              </div>
               
-              <div className="flex gap-3 flex-1">
                 <Input
                   id="video-url"
                   type="url"
@@ -355,9 +358,8 @@ export default function InterpolatePage() {
                       setInterpolatedVideoUrl(""); // Clear demo video URL
                     }
                   }}
-                  className="flex-1"
+                  className="w-full"
                 />
-              </div>
             </div>
             
             <input
@@ -380,13 +382,13 @@ export default function InterpolatePage() {
 
           {/* Video Comparison Section */}
             <div className="grid gap-4 overflow-hidden">
-            <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Original Video */}
               <div className="field flex-1 min-w-0 overflow-hidden">
                 <Label>Original Video {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
                 <div className="flex flex-col h-full w-full">
                   {/* Video Container */}
-                  <div className="flex-1 w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg">
+                  <div className="w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg min-h-[200px] md:min-h-[300px]">
                     {file ? (
                       <div className="relative group w-full">
                       <video
@@ -491,7 +493,7 @@ export default function InterpolatePage() {
                 <Label>Interpolated Video (2x Frame Rate) {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
                 <div className="flex flex-col h-full w-full">
                   {/* Video Container */}
-                  <div className="flex-1 w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg">
+                  <div className="w-full overflow-hidden flex items-center justify-center bg-black/5 rounded-lg min-h-[200px] md:min-h-[300px]">
                     {resultReady && !isRunning && interpolatedVideoUrl ? (
                       <video
                         controls
@@ -618,7 +620,72 @@ export default function InterpolatePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Mobile view - Cards */}
+            <div className="block md:hidden space-y-3">
+              {historyItems.map((item) => (
+                <div key={item.id} className="p-4 bg-surface rounded-lg border border-border">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="text-sm font-medium text-body">
+                        {item.filename || "URL Input"}
+                      </p>
+                      <p className="text-xs text-body-secondary mt-1">
+                        {new Date(item.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="w-16 h-12 bg-black rounded border overflow-hidden">
+                      <video
+                        className="w-full h-full object-cover"
+                        src={item.interpolatedVideoUrl}
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => loadFromHistory(item)}
+                      className="flex-1"
+                    >
+                      Load
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        trackEvent('interpolated_video_downloaded', {
+                          is_demo: false,
+                        });
+                        const a = document.createElement("a");
+                        a.href = item.interpolatedVideoUrl;
+                        a.download = `interpolated-${item.timestamp}.mp4`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                      }}
+                      className="flex-1"
+                    >
+                      Download
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteFromHistory(item.id)}
+                      className="text-error hover:text-error"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Desktop view - Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-border">
@@ -698,8 +765,8 @@ export default function InterpolatePage() {
                   ))}
                 </tbody>
               </table>
-          </div>
-        </CardContent>
+            </div>
+          </CardContent>
       </Card>
        )}
         </div>

@@ -1,11 +1,28 @@
 @import "tailwindcss";
 
+/* 全局重置 - 防止溢出 */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
-  /* 深色主题配色 */
-  --background: #0a0a0b;
-  --foreground: #f1f5f9;
-  --foreground-muted: #cbd5e1;
-  --foreground-subtle: #94a3b8;
+  /* 深色主题配色 - iOS风格调整 */
+  --background: #000000;
+  --foreground: #ffffff;
+  --foreground-muted: #c7c7cc;
+  --foreground-subtle: #8e8e93;
   
   /* 品牌色 - 紫蓝渐变 */
   --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -38,12 +55,14 @@
   --warning: #f59e0b;
   --warning-foreground: #ffffff;
 
-  /* 圆角系统 */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* 圆角系统 - iOS风格 */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
+  --radius-ios-card: 12px;
+  --radius-ios-button: 14px;
 
   /* 阴影系统 */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
@@ -157,8 +176,6 @@ footer {
   }
   
   .card-base {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
     border-radius: var(--radius-md);
   }
   
@@ -437,11 +454,12 @@ video {
   text-shadow: 0 0 4px rgba(102, 126, 234, 0.3);
 }
 
-/* 移动端视频容器优化 */
+/* iOS风格移动端优化 */
 @media (max-width: 640px) {
   /* 全局box-sizing重置 */
   *, *::before, *::after {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
   
   /* 防止全局溢出 */
@@ -449,6 +467,8 @@ video {
     overflow-x: hidden;
     width: 100%;
     max-width: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   /* 视频元素优化 - 保持原始比例 */
@@ -492,14 +512,23 @@ video {
     max-height: 50vh !important;
   }
   
-  /* 防止容器溢出 */
+  /* iOS风格容器边距 - 遵循Apple HIG */
   .container-page {
     width: 100%;
-    max-width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 16px !important;  /* iOS标准边距 */
+    padding-right: 16px !important;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
     box-sizing: border-box;
+  }
+  
+  /* 防止主体内容溢出 */
+  main {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   
   /* 网格和flex容器约束 */
@@ -533,18 +562,47 @@ video {
     max-width: 100%;
   }
   
-  /* 移动端按钮和输入框优化 */
+  /* iOS风格按钮优化 - 44pt最小触摸目标 */
   button {
+    min-height: 44px !important;
+    padding: 12px 20px !important;
+    border-radius: var(--radius-ios-button) !important;
+    font-size: 17px !important;  /* iOS标准字体大小 */
+    font-weight: 500;
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   
+  button:active {
+    transform: scale(0.97);
+    opacity: 0.8;
+  }
+  
+  /* iOS风格输入框 */
   input[type="url"],
-  input[type="text"] {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    min-height: 44px !important;
+    padding: 12px 16px !important;
+    font-size: 17px !important;
+    border-radius: var(--radius-sm) !important;
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: var(--primary-solid);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
   
   /* 表格水平滚动 */
@@ -562,9 +620,44 @@ video {
     padding: 0.5rem !important;
   }
   
-  /* Card组件约束 */
+  /* iOS风格Card组件 */
   .card-base {
     max-width: 100%;
     overflow: hidden;
+    border-radius: var(--radius-ios-card) !important;
+    background: rgba(28, 28, 30, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* iOS风格间距系统 */
+  .grid {
+    gap: 16px !important;
+  }
+  
+  .flex {
+    gap: 12px !important;
+  }
+  
+  /* iOS风格文字 */
+  .heading-secondary {
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+  }
+  
+  .text-body {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+  
+  .text-sm {
+    font-size: 13px !important;
+  }
+  
+  .text-xs {
+    font-size: 11px !important;
   }
 }

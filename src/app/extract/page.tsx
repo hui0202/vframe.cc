@@ -245,7 +245,8 @@ export default function ExtractPage() {
         }}
       />
       
-      <div className="grid gap-6 pb-8">
+      <div className="w-full">
+        <div className="grid gap-4 md:gap-6 w-full max-w-6xl mx-auto md:px-6 lg:px-8 pb-8">
       <Card>
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">Video Frame Extraction</CardTitle>
@@ -312,7 +313,7 @@ export default function ExtractPage() {
               {/* Extraction Method Cards */}
               <div className="space-y-4">
                 <Label className="text-sm font-medium">Choose Extraction Method:</Label>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
                     {
                       value: "current-frame",
@@ -871,6 +872,7 @@ export default function ExtractPage() {
           )}
         </CardContent>
       </Card>
+        </div>
       </div>
     </>
   );
