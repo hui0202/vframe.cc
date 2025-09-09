@@ -10,9 +10,7 @@ import {
 } from "@/components/ui/Card";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { VideoUpload } from "@/components/VideoUpload";
 import { Progress } from "@/components/ui/Progress";
 import { Alert } from "@/components/ui/Alert";
 import {
@@ -21,17 +19,96 @@ import {
   formatFileSize,
 } from "@/lib/upload-config";
 
+// LocalStorage keys
+const STORAGE_KEY_PREFIX = 'vframe_interpolation_';
+const STORAGE_KEY_HISTORY = `${STORAGE_KEY_PREFIX}history`;
+
+// History item interface
+interface HistoryItem {
+  id: string;
+  interpolatedVideoUrl: string;
+  originalVideoUrl: string;
+  timestamp: number;
+  filename?: string;
+}
+
+// Helper functions for localStorage
+const saveToStorage = (key: string, data: any) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+const loadFromStorage = (key: string, defaultValue: any = null) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch (error) {
+    console.warn('Failed to load from localStorage:', error);
+    return defaultValue;
+  }
+};
+
+const clearStorage = (key: string) => {
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    console.warn('Failed to clear localStorage:', error);
+  }
+};
+
 export default function InterpolatePage() {
   const [file, setFile] = React.useState<File | null>(null);
   const [videoUrl, setVideoUrl] = React.useState<string>("");
-  const [algo, setAlgo] = React.useState<string>("rife");
   const [isRunning, setIsRunning] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const [resultReady, setResultReady] = React.useState(false);
+  const [resultReady, setResultReady] = React.useState(true); // Set to true to show demo
   const [interpolatedVideoUrl, setInterpolatedVideoUrl] =
-    React.useState<string>("");
+    React.useState<string>("https://cdn.vframe.cc/videos/1757418968939-fg2x0x1mmkq.mp4");
   const [error, setError] = React.useState<string>("");
   const [uploadProgress, setUploadProgress] = React.useState(0);
+  
+  // Demo video URLs - placeholders for now
+  const [demoOriginalUrl] = React.useState<string>("https://cdn.vframe.cc/videos/1757418882492-8jlghu4oyln.mp4");
+  const [demoInterpolatedUrl] = React.useState<string>("https://cdn.vframe.cc/videos/1757418968939-fg2x0x1mmkq.mp4");
+  const [isUsingDemo, setIsUsingDemo] = React.useState(true);
+  const [historyItems, setHistoryItems] = React.useState<HistoryItem[]>([]);
+
+  // Load only history on component mount - always start with demo
+  React.useEffect(() => {
+    const savedHistory = loadFromStorage(STORAGE_KEY_HISTORY, []);
+    setHistoryItems(savedHistory);
+    
+    // Always start in demo mode regardless of localStorage
+    // This ensures first-time users always see the demo
+  }, []);
+
+  // Helper functions for history management
+  const addToHistory = (item: Omit<HistoryItem, 'id'>) => {
+    const newItem: HistoryItem = {
+      ...item,
+      id: Date.now().toString(),
+    };
+    
+    const updatedHistory = [newItem, ...historyItems].slice(0, 10); // Keep only latest 10 items
+    setHistoryItems(updatedHistory);
+    saveToStorage(STORAGE_KEY_HISTORY, updatedHistory);
+  };
+
+  const deleteFromHistory = (id: string) => {
+    const updatedHistory = historyItems.filter(item => item.id !== id);
+    setHistoryItems(updatedHistory);
+    saveToStorage(STORAGE_KEY_HISTORY, updatedHistory);
+  };
+
+  const loadFromHistory = (item: HistoryItem) => {
+    setInterpolatedVideoUrl(item.interpolatedVideoUrl);
+    setResultReady(true);
+    setIsUsingDemo(false);
+    // No need to save to localStorage - just display the result
+  };
 
   // Function to upload video file and get URL
   const uploadVideoFile = async (file: File): Promise<string> => {
@@ -131,6 +208,8 @@ export default function InterpolatePage() {
       return;
     }
 
+    // Switch from demo mode to user mode
+    setIsUsingDemo(false);
     setIsRunning(true);
     setProgress(0);
     setResultReady(false);
@@ -153,13 +232,24 @@ export default function InterpolatePage() {
       setProgress(90);
 
       // Handle the result
+      let finalResultUrl = "";
       if (typeof result === "string") {
+        finalResultUrl = result;
         setInterpolatedVideoUrl(result);
       } else if (result.interpolated_video_url) {
+        finalResultUrl = result.interpolated_video_url;
         setInterpolatedVideoUrl(result.interpolated_video_url);
       } else {
         throw new Error("Invalid response format from API");
       }
+
+      // Add to history only - no need to save current state
+      addToHistory({
+        interpolatedVideoUrl: finalResultUrl,
+        originalVideoUrl: urlToProcess,
+        timestamp: Date.now(),
+        filename: file ? file.name : undefined,
+      });
 
       setProgress(100);
       setResultReady(true);
@@ -179,115 +269,221 @@ export default function InterpolatePage() {
       <Card>
         <CardHeader>
           <CardTitle className="heading-secondary text-glow">
-            Video Interpolation
+            RIFE AI Video Interpolation - Double Frame Rate
           </CardTitle>
           <CardDescription className="text-body">
-            Upload a video file or provide a video URL to generate interpolated
-            frames using AI.
+            Upload a video file or provide a video URL to double the frame rate using RIFE AI interpolation technology.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6">
-          <div className="grid lg:grid-cols-2 gap-6">
+          {/* Video Comparison Section */}
             <div className="grid gap-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Original Video */}
               <div className="field">
-                <Label htmlFor="video">Video File</Label>
-                <VideoUpload value={file} onChange={setFile} />
+                <Label>Original Video {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
+                <div className="flex flex-col h-full">
+                  {/* Video Container */}
+                  <div className="flex-1">
+                    {file ? (
+                      <div className="relative group">
+                      <video
+                        controls
+                        loop
+                        className="w-full max-h-96 rounded-lg border border-border object-contain"
+                        src={URL.createObjectURL(file)}
+                        ref={(video) => {
+                          if (video) {
+                            video.playbackRate = 0.5;
+                          }
+                        }}
+                      >
+                          Your browser does not support the video tag.
+                        </video>
+                        <div className="absolute top-0 left-0 right-0 bottom-12 bg-black rounded-t-lg flex items-center justify-center opacity-0 group-hover:opacity-40 transition-opacity cursor-pointer"
+                             onClick={() => document.getElementById('video-file-input')?.click()}>
+                          <div className="text-white text-center drop-shadow-lg">
+                            <div className="text-lg mb-1">📁</div>
+                            <p className="text-sm font-medium">Click to change video</p>
+                          </div>
+                        </div>
+                        <input
+                          id="video-file-input"
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                        onChange={(e) => {
+                        const selectedFile = e.target.files?.[0];
+                        if (selectedFile) {
+                          setFile(selectedFile);
+                          setVideoUrl(""); // Clear URL when file is selected
+                          setIsUsingDemo(false); // Switch from demo mode
+                          setResultReady(false); // Clear demo results
+                          setInterpolatedVideoUrl(""); // Clear demo video URL
+                        }
+                      }}
+                        />
+                      </div>
+                    ) : videoUrl ? (
+                    <video
+                      controls
+                      loop
+                      className="w-full max-h-96 rounded-lg border border-border object-contain"
+                      src={videoUrl}
+                      ref={(video) => {
+                        if (video) {
+                          video.playbackRate = 0.5;
+                        }
+                      }}
+                    >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : isUsingDemo ? (
+                      <div className="relative group">
+                        <video
+                          controls
+                          loop
+                          className="w-full max-h-96 rounded-lg border border-border object-contain"
+                          src={demoOriginalUrl}
+                          ref={(video) => {
+                            if (video) {
+                              video.playbackRate = 0.5;
+                            }
+                          }}
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                        <div className="absolute top-0 left-0 right-0 bottom-12 bg-black rounded-t-lg flex items-center justify-center opacity-0 group-hover:opacity-40 transition-opacity cursor-pointer"
+                             onClick={() => document.getElementById('video-file-input')?.click()}>
+                          <div className="text-white text-center drop-shadow-lg">
+                            <div className="text-lg mb-1">📁</div>
+                            <p className="text-sm font-medium">Click to upload your video</p>
+                          </div>
+                        </div>
+                        <input
+                          id="video-file-input"
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                        onChange={(e) => {
+                        const selectedFile = e.target.files?.[0];
+                        if (selectedFile) {
+                          setFile(selectedFile);
+                          setVideoUrl(""); // Clear URL when file is selected
+                          setIsUsingDemo(false); // Switch from demo mode
+                          setResultReady(false); // Clear demo results
+                          setInterpolatedVideoUrl(""); // Clear demo video URL
+                        }
+                      }}
+                        />
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-full h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors"
+                        onClick={() => document.getElementById('video-file-input')?.click()}
+                      >
+                        <div className="text-center">
+                          <div className="text-4xl mb-2">📁</div>
+                          <p className="text-body-secondary">Click to select video file</p>
+                          <p className="text-xs text-body-secondary mt-1">or provide URL below</p>
+                        </div>
+                        <input
+                          id="video-file-input"
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                        onChange={(e) => {
+                        const selectedFile = e.target.files?.[0];
+                        if (selectedFile) {
+                          setFile(selectedFile);
+                          setVideoUrl(""); // Clear URL when file is selected
+                          setIsUsingDemo(false); // Switch from demo mode
+                          setResultReady(false); // Clear demo results
+                          setInterpolatedVideoUrl(""); // Clear demo video URL
+                        }
+                      }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Bottom Info Area - Fixed Height */}
+                  <div className="mt-2 h-12 flex flex-col justify-start">
                 {file && (
-                  <div className="mt-2">
                     <p className="text-xs text-body-secondary">
                       Size: {formatFileSize(file.size)}
                       {!validateFileSize(file.size, file.type) && (
                         <span className="text-error ml-2">
-                          ⚠️ File too large (max:{" "}
-                          {Math.round(
-                            getMaxFileSize(file.type) / (1024 * 1024)
-                          )}
-                          MB)
+                            ⚠️ File too large (max: {Math.round(getMaxFileSize(file.type) / (1024 * 1024))}MB)
                         </span>
                       )}
                     </p>
+                    )}
                   </div>
-                )}
-                <p className="help-text">
-                  Upload a video file to interpolate (max: 500MB for videos)
-                </p>
+                </div>
               </div>
 
+              {/* Interpolated Video */}
               <div className="field">
-                <Label htmlFor="video-url">Or Video URL</Label>
-                <Input
-                  id="video-url"
-                  type="url"
-                  placeholder="https://example.com/video.mp4"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                />
-                <p className="help-text">
-                  Provide a direct video URL instead of uploading
+                <Label>Interpolated Video (2x Frame Rate) {isUsingDemo && <span className="text-xs text-body-secondary">(Demo)</span>}</Label>
+                <div className="flex flex-col h-full">
+                  {/* Video Container */}
+                  <div className="flex-1">
+                    {resultReady && !isRunning && interpolatedVideoUrl ? (
+                      <video
+                        controls
+                        loop
+                        className="w-full max-h-96 rounded-lg border border-border object-contain"
+                        src={isUsingDemo ? demoInterpolatedUrl : interpolatedVideoUrl}
+                        ref={(video) => {
+                          if (video) {
+                            video.playbackRate = 0.5;
+                          }
+                        }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <div className="w-full min-h-[200px] max-h-96 bg-surface rounded-lg border border-dashed border-border flex items-center justify-center aspect-video">
+                        <div className="text-center">
+                          <div className="text-4xl mb-2">🎬</div>
+                          <p className="text-body-secondary">
+                            {isRunning ? "Processing..." : "Interpolated video will appear here"}
+                          </p>
+                          <p className="text-xs text-body-secondary mt-1">
+                            {isRunning ? "Please wait..." : "2x frame rate result"}
                 </p>
               </div>
             </div>
-
-            <div className="grid gap-4">
-              <div className="field">
-                <Label>Interpolation Algorithm</Label>
-                <Select
-                  value={algo}
-                  onChange={setAlgo}
-                  options={[
-                    { label: "RIFE (default)", value: "rife" },
-                    { label: "FILM/DAIN (placeholder)", value: "dain" },
-                  ]}
-                />
+                    )}
               </div>
 
-              <div className="field">
-                <Label htmlFor="target-fps">Target FPS</Label>
-                <Input
-                  id="target-fps"
-                  type="number"
-                  min={24}
-                  step={1}
-                  defaultValue={60}
-                />
-              </div>
-
-              <div className="field">
-                <Label htmlFor="strength">Smoothness (0-1)</Label>
-                <Input
-                  id="strength"
-                  type="number"
-                  min={0}
-                  max={1}
-                  step={0.1}
-                  defaultValue={0.8}
-                />
-              </div>
-
-              <div className="flex gap-3 pt-2">
+                  {/* Bottom Action Area - Fixed Height */}
+                  <div className="mt-2 h-12 flex items-start">
+                    {resultReady && !isRunning && interpolatedVideoUrl && !isUsingDemo && (
                 <Button
-                  disabled={(!file && !videoUrl) || isRunning}
-                  onClick={handleInterpolation}
-                >
-                  {isRunning ? "Processing..." : "Start Interpolation"}
-                </Button>
-                <Button
-                  variant="ghost"
+                        variant="outline"
+                        size="sm"
                   onClick={() => {
-                    setFile(null);
-                    setVideoUrl("");
-                    setProgress(0);
-                    setIsRunning(false);
-                    setResultReady(false);
-                    setError("");
-                    setInterpolatedVideoUrl("");
-                    setUploadProgress(0);
-                  }}
-                >
-                  Reset
+                          const a = document.createElement("a");
+                          a.href = interpolatedVideoUrl;
+                          a.download = `interpolated-video-${Date.now()}.mp4`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                        }}
+                      >
+                        Download
                 </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
               </div>
 
+          {/* Loading and Status Section */}
+          <div className="grid gap-4">
               {isRunning && (
                 <div className="grid gap-2">
                   {file && uploadProgress > 0 && uploadProgress < 100 && (
@@ -315,37 +511,118 @@ export default function InterpolatePage() {
                 </Alert>
               )}
 
-              {resultReady && !isRunning && interpolatedVideoUrl && (
-                <div className="grid gap-4">
+            {resultReady && !isRunning && interpolatedVideoUrl && !isUsingDemo && (
                   <Alert variant="success" title="Completed">
-                    Interpolation completed successfully!
+                Interpolation completed successfully! Compare the videos above to see the difference.
                   </Alert>
+            )}
+          </div>
+
+          {/* Parameters Section */}
+          <div className="grid gap-4">
                   <div className="field">
-                    <Label>Interpolated Video</Label>
+              <Label htmlFor="video-url">Video URL (Alternative)</Label>
+                <Input
+                  id="video-url"
+                  type="url"
+                  placeholder="https://example.com/video.mp4"
+                  value={videoUrl}
+                onChange={(e) => {
+                  setVideoUrl(e.target.value);
+                  if (e.target.value) {
+                    setFile(null); // Clear file when URL is provided
+                    setIsUsingDemo(false); // Switch from demo mode
+                    setResultReady(false); // Clear demo results
+                    setInterpolatedVideoUrl(""); // Clear demo video URL
+                  }
+                }}
+                />
+                <p className="help-text">
+                Provide a direct video URL instead of uploading a file
+                </p>
+              </div>
+            </div>
+
+          {/* Controls Section */}
+            <div className="grid gap-4">
+            <div className="flex gap-3">
+                <Button
+                  disabled={(!file && !videoUrl) || isRunning}
+                  onClick={handleInterpolation}
+                size="lg"
+                >
+                  {isRunning ? "Processing..." : "Start Interpolation"}
+                </Button>
+              </div>
+
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* History Section */}
+      {historyItems.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="heading-secondary">
+              Processing History
+            </CardTitle>
+            <CardDescription className="text-body">
+              Your recent video interpolation results
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left p-3 text-sm font-medium text-body">Date</th>
+                    <th className="text-left p-3 text-sm font-medium text-body">Source</th>
+                    <th className="text-left p-3 text-sm font-medium text-body">Result</th>
+                    <th className="text-left p-3 text-sm font-medium text-body">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyItems.map((item) => (
+                    <tr key={item.id} className="border-b border-border hover:bg-surface transition-colors">
+                      <td className="p-3 text-sm text-body-secondary">
+                        {new Date(item.timestamp).toLocaleString()}
+                      </td>
+                      <td className="p-3 text-sm text-body">
+                        {item.filename ? (
+                          <span className="font-medium">{item.filename}</span>
+                        ) : (
+                          <span className="text-body-secondary">URL Input</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-12 bg-surface rounded border overflow-hidden">
                     <video
-                      controls
-                      className="w-full max-w-md rounded-lg border border-border"
-                      src={interpolatedVideoUrl}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
-                    <div className="flex gap-2 mt-2">
+                              className="w-full h-full object-cover"
+                              src={item.interpolatedVideoUrl}
+                              muted
+                              playsInline
+                            />
+                          </div>
+                          <span className="text-sm text-body-secondary">Interpolated</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          window.open(interpolatedVideoUrl, "_blank")
-                        }
+                            onClick={() => loadFromHistory(item)}
                       >
-                        Open in New Tab
+                            Load
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
                           const a = document.createElement("a");
-                          a.href = interpolatedVideoUrl;
-                          a.download = `interpolated-video-${Date.now()}.mp4`;
+                              a.href = item.interpolatedVideoUrl;
+                              a.download = `interpolated-${item.timestamp}.mp4`;
                           document.body.appendChild(a);
                           a.click();
                           document.body.removeChild(a);
@@ -353,14 +630,25 @@ export default function InterpolatePage() {
                       >
                         Download
                       </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteFromHistory(item.id)}
+                            className="text-error hover:text-error"
+                          >
+                            Delete
+                      </Button>
                     </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }
+
