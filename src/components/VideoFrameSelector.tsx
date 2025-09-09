@@ -160,6 +160,7 @@ export function VideoFrameSelector({
     return `${mins}:${secs.padStart(5, '0')}`;
   };
 
+
   if (!file) {
     return null;
   }

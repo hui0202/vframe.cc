@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { trackEvent, trackButtonClick } from "@/lib/analytics";
 
 export type VideoUploadProps = {
   value?: File | null;
@@ -15,6 +16,20 @@ export function VideoUpload({ value = null, onChange, className }: VideoUploadPr
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    
+    if (file) {
+      // 追踪视频上传事件
+      try {
+        trackEvent('video_uploaded', {
+          file_name: file.name,
+        });
+      } catch (error) {
+        trackEvent('video_upload_failed', {
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+    
     onChange?.(file ?? null);
     // Reset input value to allow selecting the same file again
     e.target.value = '';
@@ -69,6 +84,11 @@ export function VideoUpload({ value = null, onChange, className }: VideoUploadPr
       <div className="flex gap-3">
         <Button 
           onClick={() => {
+            trackButtonClick(
+              value ? 'Change Video' : 'Select Video', 
+              'Video Upload', 
+              'Upload Component'
+            );
             // Reset input value before clicking to ensure change event fires
             if (inputRef.current) {
               inputRef.current.value = '';
@@ -81,7 +101,14 @@ export function VideoUpload({ value = null, onChange, className }: VideoUploadPr
           {value ? "Change Video" : "Select Video"}
         </Button>
         {value ? (
-          <Button variant="outline" onClick={() => onChange?.(null)} size="md">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              trackButtonClick('Clear Video', 'Video Upload', 'Upload Component');
+              onChange?.(null);
+            }} 
+            size="md"
+          >
             Clear
           </Button>
         ) : null}

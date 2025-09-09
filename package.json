@@ -8,12 +8,15 @@
     "start": "next start"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.23.7",
+    "@amplitude/plugin-session-replay-browser": "^1.22.12",
     "@aws-sdk/client-s3": "^3.883.0",
     "@aws-sdk/s3-presigned-post": "^3.883.0",
     "@aws-sdk/s3-request-presigner": "^3.883.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.3.2",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.11.0",
     "jszip": "^3.10.1",
     "mp4box": "^2.1.1",

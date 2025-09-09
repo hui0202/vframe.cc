@@ -6,9 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { websiteSchema, organizationSchema, webApplicationSchema } from "@/lib/seo-data";
 import { BlurGradientBg } from "@/lib/BlurGradientBg.module.js"
 import { useEffect } from "react";
+import { trackPageView, trackButtonClick } from "@/lib/analytics";
 
 export default function Home() {
   useEffect(() => {
+    // 追踪页面浏览
+    trackPageView('Homepage', '/');
+    
     const colorbg = new BlurGradientBg({
       dom: "box",
       colors: [
@@ -61,12 +65,21 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 px-4">
             <Link href="/extract">
-              <Button size="lg" className="text-base px-8 w-full sm:w-auto cursor-pointer">
+              <Button 
+                size="lg" 
+                className="text-base px-8 w-full sm:w-auto cursor-pointer"
+                onClick={() => trackButtonClick('Extract Frames CTA', 'Homepage', 'Hero Section')}
+              >
                 🎬 Extract Frames
               </Button>
             </Link>
             <Link href="/interpolate">
-              <Button variant="outline" size="lg" className="text-base px-8 w-full sm:w-auto cursor-pointer">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-base px-8 w-full sm:w-auto cursor-pointer"
+                onClick={() => trackButtonClick('Try Interpolation CTA', 'Homepage', 'Hero Section')}
+              >
                 ⚡ Try Interpolation
               </Button>
             </Link>

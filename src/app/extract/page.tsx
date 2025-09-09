@@ -13,6 +13,7 @@ import { extractVideoMetadata } from "@/lib/extract-video-metadata";
 import { VideoFrameSelector } from "@/components/VideoFrameSelector";
 import { cn } from "@/lib/cn";
 import { softwareApplicationSchema, howToSchema } from "@/lib/seo-data";
+import { trackPageView, trackEvent, trackButtonClick } from "@/lib/analytics";
 
 interface ExtractionResult {
   frames: ExtractedVideoFrame[];
@@ -57,6 +58,12 @@ export default function ExtractPage() {
 
   const downloadFramesAsZip = async (frames: ExtractedVideoFrame[]) => {
     try {
+      // 追踪批量下载事件
+      trackEvent('frames_downloaded', {
+        frames_count: frames.length,
+        extraction_strategy: method,
+      });
+      
       // Create a zip file containing all frames
       const { default: JSZip } = await import('jszip');
       const zip = new JSZip();
@@ -143,6 +150,10 @@ export default function ExtractPage() {
     setError(null);
 
     try {
+      // 追踪帧提取开始事件
+      trackEvent('frame_extraction_started', {
+        extraction_strategy: method,
+      });
       let frames: ExtractedVideoFrame[] = [];
 
       // Use already loaded frames if available, otherwise extract using the shared extractor
@@ -203,9 +214,22 @@ export default function ExtractPage() {
       setResult({ frames });
       setProgress(100);
       
+      // 追踪帧提取完成事件
+      trackEvent('frame_extraction_completed', {
+        extraction_strategy: method,
+        frames_extracted: frames.length,
+      });
+      
     } catch (error) {
       console.error('Extraction failed:', error);
-      setError(error instanceof Error ? error.message : 'Extraction failed');
+      const errorMessage = error instanceof Error ? error.message : 'Extraction failed';
+      setError(errorMessage);
+      
+      // 追踪帧提取失败事件
+      trackEvent('frame_extraction_failed', {
+        extraction_strategy: method,
+        error_message: errorMessage,
+      });
     } finally {
       setIsRunning(false);
     }

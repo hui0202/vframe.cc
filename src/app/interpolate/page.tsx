@@ -18,6 +18,7 @@ import {
   getMaxFileSize,
   formatFileSize,
 } from "@/lib/upload-config";
+import { trackPageView, trackEvent } from "@/lib/analytics";
 
 // Import structured data for interpolation
 const interpolationSchema = {
@@ -240,6 +241,10 @@ export default function InterpolatePage() {
     setInterpolatedVideoUrl("");
 
     try {
+      // 追踪插帧开始事件
+      trackEvent('interpolation_started', {
+        is_demo: false,
+      });
       let urlToProcess = videoUrl;
 
       // If file is selected, upload it first
@@ -276,11 +281,22 @@ export default function InterpolatePage() {
 
       setProgress(100);
       setResultReady(true);
+      
+      // 追踪插帧完成事件
+      trackEvent('interpolation_completed', {
+        is_demo: false,
+      });
+      
     } catch (error) {
       console.error("Interpolation error:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to interpolate video"
-      );
+      const errorMessage = error instanceof Error ? error.message : "Failed to interpolate video";
+      setError(errorMessage);
+      
+      // 追踪插帧失败事件
+      trackEvent('interpolation_failed', {
+        error_message: errorMessage,
+        is_demo: false,
+      });
     } finally {
       setIsRunning(false);
       setUploadProgress(0);
@@ -509,14 +525,19 @@ export default function InterpolatePage() {
                 <Button
                         variant="outline"
                         size="sm"
-                  onClick={() => {
-                          const a = document.createElement("a");
-                          a.href = interpolatedVideoUrl;
-                          a.download = `interpolated-video-${Date.now()}.mp4`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                        }}
+                      onClick={() => {
+                        // 追踪插帧视频下载事件
+                        trackEvent('interpolated_video_downloaded', {
+                          is_demo: isUsingDemo,
+                        });
+                        
+                        const a = document.createElement("a");
+                        a.href = interpolatedVideoUrl;
+                        a.download = `interpolated-video-${Date.now()}.mp4`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                      }}
                       >
                         Download
                 </Button>
@@ -643,6 +664,11 @@ export default function InterpolatePage() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          // 追踪历史记录视频下载事件
+                          trackEvent('interpolated_video_downloaded', {
+                            is_demo: false,
+                          });
+                          
                           const a = document.createElement("a");
                               a.href = item.interpolatedVideoUrl;
                               a.download = `interpolated-${item.timestamp}.mp4`;

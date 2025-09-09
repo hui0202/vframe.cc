@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { Nav } from "@/components/Nav";
+import { AmplitudeProvider } from "@/components/AmplitudeProvider";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -106,32 +108,36 @@ export default function RootLayout({
             })
           }}
         />
+        
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="border-b border-border/50 bg-background/95 sticky top-0 z-50 supports-[backdrop-filter]:backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
-          <div className="container-page flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
-              <img 
-                src="/android-chrome-192x192.png" 
-                alt="vframe.cc logo" 
-                width={40} 
-                height={40}
-                className="rounded-lg shadow-sm"
-              />
-              <span className="text-lg font-bold text-gradient-primary text-glow">
-                vframe.cc
-              </span>
-            </Link>
-            <Nav />
-          </div>
-        </header>
-        <main className="container-page py-12">{children}</main>
-        <footer className="border-t border-border/50 bg-background/90 supports-[backdrop-filter]:backdrop-blur-sm supports-[backdrop-filter]:bg-background/50">
-          <div className="container-page h-16 flex items-center justify-between text-sm text-body-secondary">
-            <span>© {new Date().getFullYear()} vframe.cc - Professional Video Processing Tool</span>
-            <span className="text-gradient-accent text-emphasis">Making video processing easier</span>
-          </div>
-        </footer>
+        <Analytics />
+        <AmplitudeProvider>
+          <header className="border-b border-border/50 bg-background/95 sticky top-0 z-50 supports-[backdrop-filter]:backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
+            <div className="container-page flex h-16 items-center justify-between">
+              <Link href="/" className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
+                <img 
+                  src="/android-chrome-192x192.png" 
+                  alt="vframe.cc logo" 
+                  width={40} 
+                  height={40}
+                  className="rounded-lg shadow-sm"
+                />
+                <span className="text-lg font-bold text-gradient-primary text-glow">
+                  vframe.cc
+                </span>
+              </Link>
+              <Nav />
+            </div>
+          </header>
+          <main className="container-page py-12">{children}</main>
+          <footer className="border-t border-border/50 bg-background/90 supports-[backdrop-filter]:backdrop-blur-sm supports-[backdrop-filter]:bg-background/50">
+            <div className="container-page h-16 flex items-center justify-between text-sm text-body-secondary">
+              <span>© {new Date().getFullYear()} vframe.cc - Professional Video Processing Tool</span>
+              <span className="text-gradient-accent text-emphasis">Making video processing easier</span>
+            </div>
+          </footer>
+        </AmplitudeProvider>
       </body>
     </html>
   );
