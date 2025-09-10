@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Script from "next/script";
 import { Nav } from "@/components/Nav";
 import { AmplitudeProvider } from "@/components/AmplitudeProvider";
 import { Analytics } from "@vercel/analytics/next"
@@ -108,9 +109,25 @@ export default function RootLayout({
             })
           }}
         />
-        
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Google Ads Conversion Tracking */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17544847064"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-ads"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'AW-17544847064');
+            `,
+          }}
+        />
         <Analytics />
         <AmplitudeProvider>
           <header className="border-b border-border/50 bg-background/95 sticky top-0 z-50 supports-[backdrop-filter]:backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
