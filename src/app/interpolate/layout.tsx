@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "RIFE AI Video Interpolation Tool",
@@ -28,5 +29,22 @@ export default function InterpolateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <Script
+        id="interpolate-conversion-tracking"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            gtag('event', 'conversion', {
+              'send_to': 'AW-17544847064/wrw-CIC4tZcbENi9hK5B',
+              'value': 1.0,
+              'currency': 'HKD'
+            });
+          `,
+        }}
+      />
+      {children}
+    </>
+  );
 }
