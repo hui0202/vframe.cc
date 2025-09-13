@@ -155,6 +155,82 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 资源与帮助 */}
+      <section className="py-8 px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl heading-secondary mb-3">Resources & Support</h2>
+          <p className="text-body-secondary max-w-2xl mx-auto">
+            Learn how to make the most of our video processing tools with tutorials, examples, and documentation
+          </p>
+        </div>
+        
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <Link href="/tutorials" className="block group">
+            <Card className="h-full hover:scale-105 transition-all duration-300 hover:shadow-lg">
+              <CardContent className="py-6 text-center">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-solid/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl">📚</span>
+                </div>
+                <h3 className="font-semibold text-base mb-2 group-hover:text-primary-solid transition-colors">
+                  Tutorials
+                </h3>
+                <p className="text-sm text-body-secondary">
+                  Step-by-step guides for frame extraction and AI interpolation
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/use-cases" className="block group">
+            <Card className="h-full hover:scale-105 transition-all duration-300 hover:shadow-lg">
+              <CardContent className="py-6 text-center">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent/20 to-primary-solid/20 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl">🎯</span>
+                </div>
+                <h3 className="font-semibold text-base mb-2 group-hover:text-primary-solid transition-colors">
+                  Use Cases
+                </h3>
+                <p className="text-sm text-body-secondary">
+                  Real-world applications in gaming, content creation, and more
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/features" className="block group">
+            <Card className="h-full hover:scale-105 transition-all duration-300 hover:shadow-lg">
+              <CardContent className="py-6 text-center">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-solid/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl">✨</span>
+                </div>
+                <h3 className="font-semibold text-base mb-2 group-hover:text-primary-solid transition-colors">
+                  Features
+                </h3>
+                <p className="text-sm text-body-secondary">
+                  Explore all capabilities and compare with alternatives
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/faq" className="block group">
+            <Card className="h-full hover:scale-105 transition-all duration-300 hover:shadow-lg">
+              <CardContent className="py-6 text-center">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent/20 to-primary-solid/20 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl">❓</span>
+                </div>
+                <h3 className="font-semibold text-base mb-2 group-hover:text-primary-solid transition-colors">
+                  FAQ
+                </h3>
+                <p className="text-sm text-body-secondary">
+                  Find answers to frequently asked questions
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
       </div>
     </>
   );
