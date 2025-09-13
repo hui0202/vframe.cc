@@ -3,6 +3,7 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://vframe.cc'
   const lastModified = new Date()
+  lastModified.setMilliseconds(0);
 
   return [
     {
