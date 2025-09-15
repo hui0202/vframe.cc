@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://vframe.cc",
+    url: process.env.NEXT_PUBLIC_BASE_URL,
     siteName: "vframe.cc",
     title: "Professional Video Frame Processing Tool",
     description:
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     images: ["/android-chrome-512x512.png"],
   },
   alternates: {
-    canonical: "https://vframe.cc",
+    canonical: process.env.NEXT_PUBLIC_BASE_URL,
   },
   category: "technology",
 };
@@ -111,7 +111,7 @@ export default function RootLayout({
               name: "vframe.cc",
               description:
                 "Professional video processing tool for frame extraction and RIFE AI interpolation",
-              url: "https://vframe.cc",
+              url: process.env.NEXT_PUBLIC_BASE_URL,
               applicationCategory: "MultimediaApplication",
               operatingSystem: "Any",
               offers: {

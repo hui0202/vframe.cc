@@ -77,13 +77,13 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://vframe.cc"
+      "item": process.env.NEXT_PUBLIC_BASE_URL
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Tutorials",
-      "item": "https://vframe.cc/tutorials"
+      "item": process.env.NEXT_PUBLIC_BASE_URL + "/tutorials"
     }
   ]
 };

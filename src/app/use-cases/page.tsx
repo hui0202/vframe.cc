@@ -194,7 +194,7 @@ const useCaseSchema = {
   "@type": "CollectionPage",
   "name": "Video Processing Use Cases - Frame Extraction & AI Interpolation",
   "description": "Discover how professionals use vframe.cc for video frame extraction and AI interpolation in various industries",
-  "url": "https://vframe.cc/use-cases",
+  "url": process.env.NEXT_PUBLIC_BASE_URL + "/use-cases",
   "mainEntity": {
     "@type": "ItemList",
     "itemListElement": useCases.flatMap((category, categoryIndex) => 

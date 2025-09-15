@@ -12,7 +12,7 @@ const tutorialSchema = {
   "@type": "HowTo",
   "name": "How to Extract a Single Frame from Video",
   "description": "Step-by-step guide to extract a specific frame from any video file using vframe.cc",
-  "image": "https://vframe.cc/og-image.png",
+  "image": process.env.NEXT_PUBLIC_BASE_URL + "/og-image.png",
   "totalTime": "PT3M",
   "estimatedCost": {
     "@type": "MonetaryAmount",
@@ -29,19 +29,19 @@ const tutorialSchema = {
       "@type": "HowToStep",
       "name": "Upload Video",
       "text": "Upload your video file in MP4 format to the frame extraction tool",
-      "url": "https://vframe.cc/extract"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/extract"
     },
     {
       "@type": "HowToStep",
       "name": "Navigate to Frame",
       "text": "Use the timeline slider or frame navigation buttons to find your desired frame",
-      "url": "https://vframe.cc/extract"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/extract"
     },
     {
       "@type": "HowToStep",
       "name": "Extract Frame",
       "text": "Click 'Extract Selected Frame' to download the frame as an image",
-      "url": "https://vframe.cc/extract"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/extract"
     }
   ]
 };

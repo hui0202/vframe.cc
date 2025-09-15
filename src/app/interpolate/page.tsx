@@ -26,7 +26,7 @@ const interpolationSchema = {
   "@type": "SoftwareApplication",
   "name": "RIFE AI Video Interpolation Tool",
   "description": "Double video frame rates using RIFE AI interpolation technology. Enhance video smoothness from 24/30 FPS to 60/120 FPS.",
-  "url": "https://vframe.cc/interpolate",
+  "url": process.env.NEXT_PUBLIC_BASE_URL + "/interpolate",
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "Any",
   "offers": {

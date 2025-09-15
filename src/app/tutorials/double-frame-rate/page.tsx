@@ -12,7 +12,7 @@ const tutorialSchema = {
   "@type": "HowTo",
   "name": "How to Double Video Frame Rate with AI Interpolation",
   "description": "Learn how to convert 30fps videos to smooth 60fps using RIFE AI interpolation technology",
-  "image": "https://vframe.cc/og-image.png",
+  "image": process.env.NEXT_PUBLIC_BASE_URL + "/og-image.png",
   "totalTime": "PT4M",
   "estimatedCost": {
     "@type": "MonetaryAmount",
@@ -29,19 +29,19 @@ const tutorialSchema = {
       "@type": "HowToStep",
       "name": "Upload Video",
       "text": "Upload your video file or provide a video URL",
-      "url": "https://vframe.cc/interpolate"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/interpolate"
     },
     {
       "@type": "HowToStep",
       "name": "Process with AI",
       "text": "Click 'Start Interpolation' to process your video with RIFE AI",
-      "url": "https://vframe.cc/interpolate"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/interpolate"
     },
     {
       "@type": "HowToStep",
       "name": "Download Result",
       "text": "Download your enhanced video with doubled frame rate",
-      "url": "https://vframe.cc/interpolate"
+      "url": process.env.NEXT_PUBLIC_BASE_URL + "/interpolate"
     }
   ]
 };

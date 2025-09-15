@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Video Frame Extraction Tool",
     description: "Extract frames from MP4 videos with multiple strategies. Professional video processing tool with flexible extraction options.",
-    url: "https://vframe.cc/extract",
+    url: process.env.NEXT_PUBLIC_BASE_URL + "/extract",
     images: [
       {
         url: "/android-chrome-512x512.png",
